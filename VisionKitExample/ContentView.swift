@@ -18,25 +18,28 @@ struct ContentView: View {
         VStack(spacing: 32) {
             Text("Vision Kit Example")
             Button(action: openCamera) {
-                Text("Scan").color(.white)
+                Text("Scan").foregroundColor(.white)
             }.padding(buttonInsets)
                 .background(Color.blue)
                 .cornerRadius(3.0)
             Text(text).lineLimit(nil)
-        }.presentation(scannerModal)
+        }.sheet(isPresented: self.$isShowingScannerSheet) { self.makeScannerView() }
     }
     
-    @State private var scannerModal: Modal? = nil
+    @State private var isShowingScannerSheet = false
     @State private var text: String = ""
     
     private func openCamera() {
-        guard scannerModal == nil else { return }
-        scannerModal = Modal(ScannerView(completion: { textPerPage in
+        isShowingScannerSheet = true
+    }
+    
+    private func makeScannerView() -> ScannerView {
+        ScannerView(completion: { textPerPage in
             if let text = textPerPage?.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines) {
                 self.text = text
             }
-            self.scannerModal = nil
-        }))
+            self.isShowingScannerSheet = false
+        })
     }
 }
 
